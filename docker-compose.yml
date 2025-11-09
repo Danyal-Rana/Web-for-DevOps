@@ -1,22 +1,19 @@
+version: "3.8"
+
 services:
   # MongoDB Database
   mongodb:
     image: mongo:7-jammy
     container_name: todoapp-mongodb
     restart: unless-stopped
-    env_file:
-      - .env.backend
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: todoapp
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     volumes:
       - mongodb_data:/data/db
-      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     networks:
       - todoapp-network
-    ports:
-      - "27017:27017"
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -26,46 +23,37 @@ services:
 
   # Backend API
   backend:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: mdrana/web-for-devops-backend:v1.0
     container_name: todoapp-backend
     restart: unless-stopped
-    env_file:
-      - .env.backend
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/todoapp?authSource=admin
     depends_on:
       mongodb:
         condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${MONGO_INITDB_DATABASE}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE: ${JWT_EXPIRE}
+      FRONTEND_URL: ${FRONTEND_URL}
     networks:
       - todoapp-network
     ports:
       - "5000:5000"
-    volumes:
-      - ./server:/app
-      - /app/node_modules
 
   # Frontend
   frontend:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL}
+    image: mdrana/web-for-devops-frontend:v1.0
     container_name: todoapp-frontend
     restart: unless-stopped
-    env_file:
-      - .env.frontend
     depends_on:
       - backend
+    environment:
+      NODE_ENV: production
+    ports:
+      - "80:80"
     networks:
       - todoapp-network
-    ports:
-      - "3000:80"
-    environment:
-      - NODE_ENV=production
 
 volumes:
   mongodb_data:
