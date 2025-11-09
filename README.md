@@ -58,6 +58,9 @@ A modern, full-stack todo application built with the MERN stack (MongoDB, Expres
 │   │   ├── utils/         # Utility functions
 │   │   └── styles/        # CSS files
 │   ├── public/            # Static assets
+│   ├── Dockerfile         # Frontend container configuration
+│   ├── nginx.conf         # Nginx configuration for production
+│   ├── .env.production    # Production environment variables
 │   └── package.json       # Frontend dependencies
 │
 ├── server/                # Backend Node.js application
@@ -66,8 +69,13 @@ A modern, full-stack todo application built with the MERN stack (MongoDB, Expres
 │   ├── routes/           # API routes
 │   ├── middleware/       # Custom middleware
 │   ├── config/           # Configuration files
+│   ├── Dockerfile         # Backend container configuration
+│   ├── .env.production    # Production environment variables
 │   └── package.json      # Backend dependencies
 │
+├── docker-compose.yml     # Multi-container orchestration
+├── .dockerignore         # Files to exclude from Docker build
+├── DOCKER_README.md      # Docker deployment documentation
 ├── .gitignore            # Git ignore rules
 └── README.md             # Project documentation
 ```
@@ -100,17 +108,17 @@ npm install
 ### 4. Environment Configuration
 Create environment files for both frontend and backend:
 
-#### Backend (.env in server/ directory)
+#### Backend (.env.backend)
 ```env
-NODE_ENV=development
+NODE_ENV=production
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/todoapp
+MONGODB_URI=mongodb://admin:password123@mongodb:27017/todoapp?authSource=admin
 JWT_SECRET=your_super_secret_jwt_key_here_make_it_very_long_and_random
 JWT_EXPIRE=30d
 FRONTEND_URL=http://localhost:3000
 ```
 
-#### Frontend (.env in client/ directory)
+#### Frontend (.env.frontend)
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
@@ -148,6 +156,20 @@ npm run build
 ```bash
 cd server
 npm start
+```
+
+## Docker Deployment
+
+For containerized deployment using Docker and Docker Compose, see the [Docker Deployment Guide](DOCKER_README.md).
+
+### Quick Docker Start
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:5000
 ```
 
 ## API Endpoints
@@ -201,13 +223,15 @@ npm start
 ## DevOps Ready
 
 This application is designed with DevOps practices in mind:
-- Separate frontend and backend services
-- Environment-based configuration
-- Proper error handling and logging
-- Docker-ready structure
-- CI/CD pipeline friendly
-- Health check endpoints
-- Comprehensive .gitignore
+- **Containerization**: Docker support with multi-stage builds for optimized images
+- **Orchestration**: Docker Compose for multi-container application management
+- **Persistent Storage**: MongoDB data persistence with Docker volumes
+- **Health Checks**: Automatic health monitoring for all services
+- **Environment Management**: Separate environment configurations for development and production
+- **Security**: Non-root user execution, security headers, and network isolation
+- **Scalability**: Service-based architecture ready for horizontal scaling
+- **CI/CD Pipeline Friendly**: Proper .gitignore, build scripts, and containerization
+- **Monitoring Ready**: Health check endpoints and logging infrastructure
 
 ## License
 

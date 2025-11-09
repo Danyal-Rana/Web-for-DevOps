@@ -18,5 +18,6 @@ export default defineConfig({
         outDir: 'dist',
         sourcemap: false,
         minify: 'terser'
-    }
+    },
+    base: './',
 })
