@@ -23,9 +23,7 @@ services:
 
   # Backend API
   backend:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: mdrana/todoapp-backend:v1
     container_name: todoapp-backend
     restart: unless-stopped
     environment:
@@ -42,9 +40,6 @@ services:
       - todoapp-network
     ports:
       - "5000:5000"
-    volumes:
-      - ./server:/app
-      - /app/node_modules
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/api/health || exit 1"]
       interval: 30s
@@ -54,11 +49,7 @@ services:
 
   # Frontend
   frontend:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: /api
+    image: mdrana/todoapp-frontend:v1
     container_name: todoapp-frontend
     restart: unless-stopped
     depends_on:
