@@ -1,5 +1,4 @@
 services:
-  # MongoDB Database
   mongodb:
     image: mongo:7-jammy
     container_name: todoapp-mongodb
@@ -21,9 +20,8 @@ services:
       retries: 3
       start_period: 30s
 
-  # Backend API
   backend:
-    image: mdrana/todoapp-backend:v1
+    image: mdrana/todoapp-backend:latest
     container_name: todoapp-backend
     restart: unless-stopped
     environment:
@@ -47,9 +45,8 @@ services:
       retries: 5
       start_period: 60s
 
-  # Frontend
   frontend:
-    image: mdrana/todoapp-frontend:v1
+    image: mdrana/todoapp-frontend:latest
     container_name: todoapp-frontend
     restart: unless-stopped
     depends_on:
