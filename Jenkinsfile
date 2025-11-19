@@ -48,9 +48,16 @@ pipeline {
         stage('Deploy on Jenkins EC2') {
             steps {
                 sh '''
-                cd /home/ubuntu/Web-for-DevOps
-                git pull origin main
+                echo "🔍 Switching to Jenkins workspace..."
+                cd $WORKSPACE
+
+                echo "🔄 Pulling latest images..."
                 docker compose pull
+
+                echo "⬇️  Stopping old containers..."
+                docker compose down || true
+
+                echo "🚀 Starting updated containers..."
                 docker compose up -d
                 '''
             }
